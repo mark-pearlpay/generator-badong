@@ -1,0 +1,32 @@
+version: '3'
+services:
+  api:
+    container_name: cbs_api
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      DJANGO_DEBUG: "True"
+      DATABASE_NAME: "test_db"
+      DATABASE_USER: "db_user"
+      DATABASE_PASSWORD: "THE_PASSWORD"
+      DATABASE_HOST: "mysql"
+      DATABASE_PORT: "3306"
+
+  mysql:
+    container_name: cbs_mysql
+    image: mysql:5.6.46
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: "test_db"
+      MYSQL_USER: "db_user"
+      MYSQL_PASSWORD: "THE_PASSWORD"
+      MYSQL_RANDOM_ROOT_PASSWORD: "True"
+    volumes:
+      - mysql-datavolume:/var/lib/mysql
+
+volumes:
+  mysql-datavolume:

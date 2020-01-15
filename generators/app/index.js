@@ -1,4 +1,5 @@
 const Generator = require('yeoman-generator');
+const glob = require('glob');
 
 module.exports = class extends Generator {
     
@@ -6,15 +7,15 @@ module.exports = class extends Generator {
     async prompting() {
         this.answers = await this.prompt([
             {
-            type: "input",
-            name: "name",
-            message: "Your project name",
-            default: this.appname // Default to current folder name
+                type: "input",
+                name: "name",
+                message: "Project name:",
+                default: this.appname // Default to current folder name
             },
             {
-            type: "confirm",
-            name: "cool",
-            message: "Would you like to enable the Cool feature?"
+                type: "confirm",
+                name: "cool",
+                message: "Are you sure you want to create new project?"
             }
         ]);
 
@@ -22,56 +23,15 @@ module.exports = class extends Generator {
         this.log("cool feature", this.answers.cool);
     }
 
-
-    // _prompting() {
-    //     return {
-    //         askForStuff: function () {
-    //             const done = this.async();
-            
-    //             this.prompt([{
-    //                 type: "input",
-    //                 name: "name",
-    //                 message: "Your project name",
-    //                 default: this.appname // Default to current folder name
-    //             },
-    //             {
-    //                 type: "confirm",
-    //                 name: "cool",
-    //                 message: "Would you like to enable the Cool feature?"
-    //             }]).then(prompt => {
-    //                 done();
-    //             });
-    //         },
-    //         // askForApplicationType: prompts.askForApplicationType,
-    //         // askForModuleName: prompts.askForModuleName
-    //     };
-    // }
-
-    // get prompting() {
-    //     return this._prompting();
-    // }
-
-    get method2() {
-        return this._method2;
-    }
-
-    _method2() {
-        this.log('method 2 just ran');
-    }
-
-    get method1() {
-        return this._method1;
-    }
-
-    _method1() {
-        this.log('method 1 just ran');
-    }
-
     writing() {
+        // copy all template files and folder structure
+        const appName = this.answers.name.toLowerCase().replace(/[\W_]+/g,"_");
         this.fs.copyTpl(
-            this.templatePath('index.html'),
-            this.destinationPath(`${this.answers.name}/public/index.html`),
-            { title: this.answers.name }
+            glob.sync(this.templatePath('**/*'), { dot: true }), 
+            this.destinationPath(`${appName}/`), 
+            {
+                name: appName
+            }
         );
     }
 };
