@@ -26,5 +26,4 @@
 	Password (again):
 	```
 
-- Browse local django instance:
-	You can now access the dashboard via `localhost:8080/admin`
+- Browse local django instance via `localhost:8080/admin`
