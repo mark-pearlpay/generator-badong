@@ -12,6 +12,7 @@
     "yeoman-generator"
   ],
   "dependencies": {
+    "glob": "^7.1.6",
     "yeoman-generator": "^4.4.0"
   }
 }
