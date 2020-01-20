@@ -40,3 +40,8 @@
 	```ssh
 	$ pip install -r tests/requirements.txt
 	```
+
+- Run tests
+	```ssh
+	$ pytest
+	```
