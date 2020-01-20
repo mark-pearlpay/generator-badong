@@ -4,6 +4,7 @@
 - Python3.7
 - Docker
 - Docker Compose
+- Virtual environment `pip3 install virtualenv`
 
 ## Serve API Locally:
 	
@@ -27,3 +28,15 @@
 	```
 
 - Browse local django instance via `localhost:8080/admin`
+
+## Running tests:
+- Activate virtual environment:
+	```ssh
+	$ virtualenv venv # Create virtual environment if does not exist
+	$ source venv/bin/activate
+	```
+
+- Install dependencies
+	```ssh
+	$ pip install -r tests/requirements.txt
+	```
