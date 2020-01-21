@@ -47,32 +47,31 @@ module.exports = class extends Generator {
         // Add new model to domains
         // TODO: Refactor me
         let filename = this.destinationPath('app/domain/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/application/repositories/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Repository`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Repository\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/models/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Model`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Model\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/modules/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Module`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Module\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/serializers/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Serializer`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Serializer\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/views/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}ViewSet`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}ViewSet\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         // Register models to django
         filename = this.destinationPath('app/infrastructure/admin.py');
-        let content = '';
         let data = fs.readFileSync(filename).toString().split('\n');
         let insertIndex = data.indexOf('# Import your models here.') + 2;
 
@@ -88,6 +87,30 @@ module.exports = class extends Generator {
         
         this.log(`Registered ${namePascalCase} Model to Django admin`)
 
-        // TODO app/infrastructure/urls.py
+        // Register model to URLs
+        filename = this.destinationPath('app/infrastructure/urls.py');
+        data = fs.readFileSync(filename).toString().split('\n');
+        insertIndex = data.indexOf('from rest_framework.routers import SimpleRouter') + 3;
+
+        insertLine(filename)
+            .contentSync(
+                `from infrastructure.views import ${namePascalCase}ViewSet\n` +
+                `from infrastructure.views.${nameSnakeCase} import ${namePascalCase}ViewsAPI`
+                )
+            .at(insertIndex);
+
+        data = fs.readFileSync(filename).toString().split('\n');
+        insertIndex = data.indexOf('router = OptionalSlashRouter()') + 2;
+        insertLine(filename)
+            .contentSync(`router.register('${nameDashSeparated}', ${namePascalCase}ViewSet)`)
+            .at(insertIndex);
+
+        data = fs.readFileSync(filename).toString().split('\n');
+        insertIndex = data.indexOf('urlpatterns = [') + 3;
+        insertLine(filename)                
+            .contentSync(`\tpath('${nameDashSeparated}/<int:${nameSnakeCase}_id>/increment-view', ${namePascalCase}ViewsAPI.as_view()),`)
+            .at(insertIndex);
+        
+        this.log(`Registered ${namePascalCase} to ${filename}!`)
     }
 };
