@@ -45,14 +45,33 @@ module.exports = class extends Generator {
         );
 
         // Add new model to domains
-        fs.appendFile(this.destinationPath('app/domain/__init__.py'),
-            `from .${nameSnakeCase} import ${namePascalCase}`, (err) => {
-            if (err) throw err;
-            // this.log('The "data to append" was appended to file!');
-        });
+        // TODO: Refactor me
+        let filename = this.destinationPath('app/domain/__init__.py');
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}`);
+        this.log(`${namePascalCase} was appended to ${filename}!`);
+
+        filename = this.destinationPath('app/application/repositories/__init__.py');
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Repository`);
+        this.log(`${namePascalCase} was appended to ${filename}!`);
+
+        filename = this.destinationPath('app/infrastructure/models/__init__.py');
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Model`);
+        this.log(`${namePascalCase} was appended to ${filename}!`);
+
+        filename = this.destinationPath('app/infrastructure/modules/__init__.py');
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Module`);
+        this.log(`${namePascalCase} was appended to ${filename}!`);
+
+        filename = this.destinationPath('app/infrastructure/serializers/__init__.py');
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Serializer`);
+        this.log(`${namePascalCase} was appended to ${filename}!`);
+
+        filename = this.destinationPath('app/infrastructure/views/__init__.py');
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}ViewSet`);
+        this.log(`${namePascalCase} was appended to ${filename}!`);
 
         // Register models to django
-        let filename = this.destinationPath('app/infrastructure/admin.py');
+        filename = this.destinationPath('app/infrastructure/admin.py');
         let content = '';
         let data = fs.readFileSync(filename).toString().split('\n');
         let insertIndex = data.indexOf('# Import your models here.') + 2;
@@ -67,6 +86,8 @@ module.exports = class extends Generator {
             .contentSync(`admin.site.register(${namePascalCase}Model)`)
             .at(insertIndex);
         
-        console.log(`Registered ${namePascalCase} Model to Django admin`)
+        this.log(`Registered ${namePascalCase} Model to Django admin`)
+
+        // TODO app/infrastructure/urls.py
     }
 };
