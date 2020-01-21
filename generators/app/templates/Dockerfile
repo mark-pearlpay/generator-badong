@@ -23,4 +23,4 @@ RUN python3.7 -m pip install -r requirements.txt && \
     python3.7 manage.py collectstatic --noinput
 
 # Use gunicorn
-CMD ["gunicorn", "-w", "4", "-b", ":8080", "<%= name %>.wsgi"]
+CMD ["gunicorn", "-w", "4", "-b", ":8080", "--access-logfile", "-", "--error-logfile", "-", "<%= name %>.wsgi"]
