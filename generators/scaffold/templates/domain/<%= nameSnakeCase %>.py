@@ -1,12 +1,9 @@
-from abc import ABC
 from dataclasses import dataclass
-from datetime import datetime
-from typing import List
 
+from domain import BaseEntity
 
 @dataclass
-class <%= namePascalCase %>(ABC):
-	id: int
+class <%= namePascalCase %>(BaseEntity):
 	name: str
 	duration: int
 	view_count: int

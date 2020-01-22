@@ -55,7 +55,7 @@ module.exports = class extends Generator {
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/models/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Model\n`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}Model, ${namePascalCase}Manager\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/modules/__init__.py');
