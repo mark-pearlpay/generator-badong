@@ -19,7 +19,7 @@ class <%= namePascalCase %>ViewsAPI(APIView):
         print('<%= nameSnakeCase %>_id:', <%= nameSnakeCase %>_id)
         return Response(
             # data={'message': 'Get Request'},
-            data={'<%= nameSnakeCase %>_id': <%= nameSnakeCase %>_id},
+            data=<%= nameSnakeCase %>_use_case.get_by_id(<%= nameSnakeCase %>_id),
             status=HTTPStatus.OK
         )
 
