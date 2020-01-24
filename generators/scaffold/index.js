@@ -67,7 +67,7 @@ module.exports = class extends Generator {
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         filename = this.destinationPath('app/infrastructure/views/__init__.py');
-        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}ViewSet\n`);
+        fs.appendFileSync(filename, `from .${nameSnakeCase} import ${namePascalCase}ViewsAPI\n`);
         this.log(`${namePascalCase} was appended to ${filename}!`);
 
         // Register models to django
@@ -94,22 +94,30 @@ module.exports = class extends Generator {
 
         insertLine(filename)
             .contentSync(
-                `from infrastructure.views import ${namePascalCase}ViewSet\n` +
                 `from infrastructure.views.${nameSnakeCase} import ${namePascalCase}ViewsAPI`
                 )
             .at(insertIndex);
 
         data = fs.readFileSync(filename).toString().split('\n');
-        insertIndex = data.indexOf('router = OptionalSlashRouter()') + 2;
-        insertLine(filename)
-            .contentSync(`router.register('${nameDashSeparated}', ${namePascalCase}ViewSet)`)
-            .at(insertIndex);
-
-        data = fs.readFileSync(filename).toString().split('\n');
         insertIndex = data.indexOf('urlpatterns = [') + 3;
         insertLine(filename)                
-            .contentSync(`\tpath('${nameDashSeparated}/<int:${nameSnakeCase}_id>/increment-view', ${namePascalCase}ViewsAPI.as_view()),`)
+            .contentSync(`\tpath('${nameDashSeparated}/<int:${nameSnakeCase}_id>', ${namePascalCase}ViewsAPI.as_view()),`)
+            .contentSync(`\tpath('${nameDashSeparated}/', ${namePascalCase}ViewsAPI.as_view()),`)
             .at(insertIndex);
+        
+        this.log(`Registered ${namePascalCase} to ${filename}!`)
+
+        // Register model module
+        filename = this.destinationPath(`app/${nameSnakeCase}/settings.py`);
+        data = fs.readFileSync(filename).toString().split('\n');
+        insertIndex = data.indexOf('INJECTOR_MODULES = [') + 3;
+
+        insertLine(filename)
+            .contentSync(
+                `    "infrastructure.modules.${namePascalCase}Module"`
+                )
+            .at(insertIndex);
+
         
         this.log(`Registered ${namePascalCase} to ${filename}!`)
     }
