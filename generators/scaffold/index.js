@@ -28,13 +28,14 @@ module.exports = class extends Generator {
 
     writing() {
         // copy all template files and folder structure
+        const parentFolderName = this.destinationPath().split('/').slice(-1)[0] 
         const nameSnakeCase = this.answers.name.toLowerCase().replace(/[\W_]+/g,"_");
         const nameDashSeparated = this.answers.name.toLowerCase().replace(/[\W_]+/g,"-");
         const nameCamelCase = _.camelCase(this.answers.name);
         const namePascalCase = _.upperFirst(_.camelCase(this.answers.name));
         this.fs.copyTpl(
             glob.sync(this.templatePath('**/*'), { dot: true }), 
-            this.destinationPath('app/'), 
+            this.destinationPath(), 
             {
                 name: this.answers.name,
                 nameDashSeparated: nameDashSeparated,
@@ -76,13 +77,13 @@ module.exports = class extends Generator {
         let insertIndex = data.indexOf('# Import your models here.') + 2;
 
         insertLine(filename)
-            .contentSync(`from .models import ${namePascalCase}Model`)
+            .contentSync(`from .models import ${namePascalCase}Model\n`)
             .at(insertIndex);
 
         data = fs.readFileSync(filename).toString().split('\n');
         insertIndex = data.indexOf('# Register your models here.') + 2;
         insertLine(filename)
-            .contentSync(`admin.site.register(${namePascalCase}Model)`)
+            .contentSync(`admin.site.register(${namePascalCase}Model)\n`)
             .at(insertIndex);
         
         this.log(`Registered ${namePascalCase} Model to Django admin`)
@@ -94,31 +95,70 @@ module.exports = class extends Generator {
 
         insertLine(filename)
             .contentSync(
-                `from infrastructure.views.${nameSnakeCase} import ${namePascalCase}ViewsAPI`
+                `from infrastructure.views.${nameSnakeCase} import ${namePascalCase}ViewsAPI\n`
                 )
             .at(insertIndex);
 
         data = fs.readFileSync(filename).toString().split('\n');
-        insertIndex = data.indexOf('urlpatterns = [') + 3;
+        insertIndex = data.indexOf('urlpatterns = [') + 2;
         insertLine(filename)                
-            .contentSync(`\tpath('${nameDashSeparated}/<int:${nameSnakeCase}_id>', ${namePascalCase}ViewsAPI.as_view()),`)
-            .contentSync(`\tpath('${nameDashSeparated}/', ${namePascalCase}ViewsAPI.as_view()),`)
+            .contentSync(
+                `\tpath('${nameDashSeparated}s/<int:${nameSnakeCase}_id>', ${namePascalCase}ViewsAPI.as_view()),\n` +
+                `\tpath('${nameDashSeparated}s/', ${namePascalCase}ViewsAPI.as_view()),\n`
+                )
             .at(insertIndex);
         
         this.log(`Registered ${namePascalCase} to ${filename}!`)
 
         // Register model module
-        filename = this.destinationPath(`app/${nameSnakeCase}/settings.py`);
+        filename = this.destinationPath(`app/${parentFolderName}/settings.py`);
         data = fs.readFileSync(filename).toString().split('\n');
-        insertIndex = data.indexOf('INJECTOR_MODULES = [') + 3;
+        insertIndex = data.indexOf('INJECTOR_MODULES = [') + 2;
 
         insertLine(filename)
             .contentSync(
-                `    "infrastructure.modules.${namePascalCase}Module"`
+                `    "infrastructure.modules.${namePascalCase}Module",`
                 )
             .at(insertIndex);
 
         
         this.log(`Registered ${namePascalCase} to ${filename}!`)
+
+        // Add steps to tests
+        // TODO: Refactor me
+        filename = this.destinationPath('tests/features/conftest.py');
+        fs.appendFileSync(filename,
+            `@pytest.fixture\n` +
+            `def ${nameSnakeCase}_in_test():\n` +
+            `    return {'${nameSnakeCase}': {}}\n`);
+
+        filename = this.destinationPath('tests/features/steps/given.py');
+        fs.appendFileSync(filename,
+            `@given('I dont have an ${nameSnakeCase}')\n` +
+            `def given_existing_cbs_${nameSnakeCase}(${nameSnakeCase}_in_test):\n` +
+            `   ${nameSnakeCase}_in_test['${nameSnakeCase}'] = {\n` +
+            `       '${nameSnakeCase}_id': '-1'\n` +
+            `    }\n`);
+
+        filename = this.destinationPath('tests/features/steps/then.py');
+        fs.appendFileSync(filename,
+            `@then('I should have the correct response')\n` +
+            `def then_correct_response():\n` +
+            `    print('then_correct_response')\n` +
+            `    pass\n`);
+
+        filename = this.destinationPath('tests/features/steps/when.py');
+        fs.appendFileSync(filename,
+            `@when('I get my ${nameSnakeCase}')\n` +
+            `def given_get_${nameSnakeCase}(${nameSnakeCase}_in_test):\n` +
+            `   ${nameSnakeCase}_id = ${nameSnakeCase}_in_test['${nameSnakeCase}']['${nameSnakeCase}_id']\n` +
+            `\n` +
+            `   print('${nameSnakeCase}_id:', ${nameSnakeCase}_id)\n` +
+            `\n` +
+            `   ${nameSnakeCase}_api_path = f'localhost:8080/${nameSnakeCase}s/{${nameSnakeCase}_id}'\n` +
+            `\n` +
+            `   # response = requests.get(${nameSnakeCase}_api_path, headers=headers, verify=False)\n` +
+            `\n` +
+            `   pass\n`);
     }
 };
