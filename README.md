@@ -1,6 +1,7 @@
+![Image of Badong](https://i.pinimg.com/originals/3d/96/31/3d9631a279f53ef1784c8641bb9a2976.jpg)
 # Badong - The PearlPay Backend API Code Generator
 
-> Yeoman generator for creating PearlPay backend code using python, django and mysql. Lets you quickly set up a project following best practices.
+> Yeoman generator for creating PearlPay backend microservice using python, django and mysql. Lets you quickly set up a project following best practices.
 
 ## Usage
 
@@ -10,43 +11,65 @@ Install `yo`, and `generator-badong`:
 $ npm install -g yo generator-badong
 ```
 
-**TODO**: Add how to run
+### Folder Structure
+> We follow onion architecture
+
+    .
+    ├── app
+    │   ├── application
+    │   │   ├── __init__.py
+    │   │   ├── services         # Service interface
+    │   │   ├── repositories     # Repository interface
+    │   │   │   ├── ...
+    │   │   └── use_cases        # Interface implementation
+    │   │       ├── ...
+    │   ├── domain               # Domain entities
+    │   │   ├── ...
+    │   ├── infrastructure       # Django implementations
+    │   │   ├── ...
+    │   ├── new_app_name
+    │   │   ├── ...
+    │   └── requirements.txt
+    ├── buildspec.yml
+    ├── docker-compose.yml
+    ├── Dockerfile
+    ├── features                 # BDD feature files
+    │   ├── ...
+    ├── README.md
+    └── tests
+        ├── ...
+
 
 ## Generators
 
 Available generators:
 
-* App
-  * badong
-    ```bash
-    Usage:
-        $ yo badong
-        ? Project name: new_app_name
-        ? Are you sure you want to create new project? (Y/n) y
-    ```
-    ```bash
-    Produces:
-        new_app_name/app/__init__.py
-        new_app_name/app/manage.py
-        new_app_name/app/requirements.txt
-        new_app_name/app/new_app_name/__init__.py
-        new_app_name/app/new_app_name/asgi.py
-        new_app_name/app/new_app_name/settings.py
-        new_app_name/app/new_app_name/urls.py
-        new_app_name/app/new_app_name/wsgi.py
-        new_app_name/app/application/__init__.py
-        new_app_name/app/domain/__init__.py
-        new_app_name/app/infrastructure/__init__.py
-        new_app_name/app/infrastructure/admin.py
-        new_app_name/app/infrastructure/apps.py
-        new_app_name/app/infrastructure/models.py
-        new_app_name/app/infrastructure/tests.py
-        new_app_name/app/infrastructure/views.py
-        new_app_name/app/infrastructure/migrations/__init__.py
-        new_app_name/docker-compose.yml
-        new_app_name/Dockerfile
-        new_app_name/README.md
-        new_app_name/tests/pytest.ini
-        new_app_name/tests/requirements.txt
-        new_app_name/tests/test_settings.py
-    ```
+* [badong](#app) (aka [badong:app](#app))
+* [badong:scaffold](#scaffold)
+
+### App
+Sets up a new PearlPay backend microservice, generating all the boilerplate you need to get started.
+
+Usage:
+```bash
+    $ yo badong
+    ? What is the base name of your application? new app name
+```
+
+### Scaffold
+Generates and wires a model, view, repository and test artifacts.
+
+Example:
+```bash
+    $ yo badong:scaffold
+    ? What is the model name to scaffold? newModel
+```
+
+## Team
+
+Badong is beautifully crafted by these people and a bunch of awesome [contributors](https://github.com/PearlEngineering/generator-badong/graphs/contributors)
+
+
+[![Mark Ranosa](https://secure.gravatar.com/avatar/6b4ddfe5b689d678aa772b592c0b5ab0?s=117)](www.kenranosa.com)|
+:---:|
+[Mark Ranosa](www.kenranosa.com) | 
