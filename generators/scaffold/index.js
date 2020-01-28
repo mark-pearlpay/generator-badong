@@ -111,7 +111,7 @@ module.exports = class extends Generator {
         this.log(`Registered ${namePascalCase} to ${filename}!`)
 
         // Register model module
-        filename = this.destinationPath(`app/${parentFolderName}/settings.py`);
+        filename = this.destinationPath(`app/${parentFolderName.replace(/[\W_]+/g,"_")}/settings.py`);
         data = fs.readFileSync(filename).toString().split('\n');
         insertIndex = data.indexOf('INJECTOR_MODULES = [') + 2;
 
